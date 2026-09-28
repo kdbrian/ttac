@@ -92,9 +92,41 @@ Samsung Galaxy A32 (SM-A325F), Android 13, 10 cold starts each:
 - Time to full display equals time to initial display: saved data loads before the first frame finishes, so users
   never see an empty home screen.
 
+## Frame results (measured)
+
+Same phone, warm start with the Baseline Profile, 5 iterations each, `FrameTimingGfxInfoMetric`:
+
+| Journey | Frames | P50 | P90 | P95 | P99 | Janky frames |
+|---|---|---|---|---|---|---|
+| Solo Tic-Tac-Toe (several moves) | ~198 | 93 ms | 117 ms | 133 ms | 150 ms | 100% |
+| Blocks (~12 s of rotates, drags, hard drops) | ~212 | 77 ms | 101 ms | 121 ms | 150 ms | 100% |
+
+**This is the report's most important finding: gameplay does not hit 60 fps on this mid-range phone.** A frame
+needs to finish in ~16.7 ms; the median here is 5–6× that. (The same low-battery caveat applies — throttling
+makes it worse — but it can't explain a gap this size.)
+
+Where the time goes, from reading the rendering code against these numbers:
+
+1. **The backdrop never stops.** `AnimatedBackdrop` redraws every frame: a full-screen gradient, three blob paths,
+   two screen-sized radial glows, a player-tint wash and up to 26 neon stars. On a mobile GPU that's several
+   full-screen layers of translucent overdraw per frame, behind everything else.
+2. **Marks are rebuilt on every draw.** `drawMark` recomputes each mark's point geometry and rebuilds its `Path`s
+   on every call — for the board *and* for each backdrop star — and neon marks stroke that path four times.
+3. **Idle animations keep the board redrawing.** The board's pulse and heat-flow infinite transitions invalidate it
+   every frame even when nothing is happening.
+
+The fixes follow directly — cache mark geometry and paths per (mark, style, seed); draw the backdrop's slow layers
+(gradient, blobs, glows) through `drawWithCache` or at a reduced rate and keep only the stars live; stop
+infinite transitions when there's nothing to pulse (no threats, no win) — and re-running `soloGameFrames` and
+`blocksFrames` will show whether they land.
+
 ## Reproducing
 
 1. Connect an API 33+ device (Baseline Profiles can't be generated on older, non-rooted devices).
-2. Run the two Gradle commands above.
-3. Results appear in `baselineprofile/build/outputs/connected_android_test_additional_output/` as JSON, and in
+2. Run the two Gradle commands above. To run one benchmark, pass
+   `-Pandroid.testInstrumentationRunnerArguments.class=io.gh.kdbrian.ttac.baselineprofile.StartupBenchmarks#blocksFrames`
+   (the runner honours only one `#method` per filter).
+3. **Back up app data first**: installing the benchmark build replaces the app, which clears its saved games and
+   scores on the device.
+4. Results appear in `baselineprofile/build/outputs/connected_android_test_additional_output/` as JSON, and in
    Android Studio's test results.
