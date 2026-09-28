@@ -1,4 +1,4 @@
-# 17. Persistence & reducers 🔴
+# 18. Persistence & reducers 🔴
 
 TTac stores two kinds of data, each with the right tool:
 
@@ -7,7 +7,16 @@ TTac stores two kinds of data, each with the right tool:
 | Settings (theme, colours, toggles) | **DataStore Preferences** | small key–values, observed as a `Flow` |
 | Scores, history, medals, unlocks, heat | **one JSON file** (`stats.json`) | nested structures, one atomic unit |
 
-![Scoreboard](../images/screen-scores.png){ width="35%" }
+<div class="shots two" markdown>
+<figure markdown="span">
+![Scoreboard tabs](../images/crop/scores-tabs.png){ loading=lazy }
+<figcaption>Scoreboard tabs</figcaption>
+</figure>
+<figure markdown="span">
+![A solo record card: donut, played count, W/D/L/best tiles](../images/crop/scores-card.png){ loading=lazy }
+<figcaption>A solo record card: donut, played count, W/D/L/best tiles</figcaption>
+</figure>
+</div>
 
 ## Reducers: state in, state out
 

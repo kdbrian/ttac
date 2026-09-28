@@ -28,7 +28,10 @@ Brush.radialGradient(
 
 That's the brush for each win "heat zone" — the soft glows sitting under the three winning ✕s here:
 
-![Win settled](../images/win-settled.png){ width="50%" }
+<figure class="single narrow" markdown="span">
+![Heat zones glow beneath the three winning ✕s](../images/win-settled.png){ loading=lazy }
+<figcaption>Heat zones glow beneath the three winning ✕s</figcaption>
+</figure>
 
 ## The heat ramp
 
@@ -61,23 +64,40 @@ val r = cell * (0.62f + 0.07f * pulse) * local
 - The stroke itself is four `drawLine`s — wide faint, medium, a **linear gradient** from the heat ramp, and a thin
   white core. Exactly the neon trick from [chapter 4](marks.md), with a gradient.
 
-| Ignite (820 ms) | Burst (1250 ms) | 4×4 win |
-|---|---|---|
-| ![](../images/win-ignite.png) | ![](../images/win-burst.png) | ![](../images/win-4x4.png) |
+<div class="shots" markdown>
+<figure markdown="span">
+![Ignite (820 ms)](../images/win-ignite.png){ loading=lazy }
+<figcaption>Ignite (820 ms)</figcaption>
+</figure>
+<figure markdown="span">
+![Burst (1250 ms)](../images/win-burst.png){ loading=lazy }
+<figcaption>Burst (1250 ms)</figcaption>
+</figure>
+<figure markdown="span">
+![4×4 win](../images/win-4x4.png){ loading=lazy }
+<figcaption>4×4 win</figcaption>
+</figure>
+</div>
 
 At 820 ms the stroke is still travelling and only the zones it has passed have lit; at 1250 ms the particle burst is
 mid-flight. The same code handles longer lines on bigger boards.
 
 ## Threat heat
 
-![Threat heat](../images/threat-heat.png){ width="50%" }
+<figure class="single narrow" markdown="span">
+![✕ threatens the top row: the empty cell glows pink](../images/threat-heat.png){ loading=lazy }
+<figcaption>✕ threatens the top row: the empty cell glows pink</figcaption>
+</figure>
 
 `Board.threats(mark)` returns empty cells that would complete a line. Each gets a radial glow in that player's
 colour plus a thin ring that shrinks as the glow swells — a pulse you notice peripherally without it shouting.
 
 ## The heatmap: felt, not read
 
-![Heatmap field](../images/heatmap-field.png){ width="50%" }
+<figure class="single narrow" markdown="span">
+![The heatmap as a thermal field — no numbers](../images/heatmap-field.png){ loading=lazy }
+<figcaption>The heatmap as a thermal field — no numbers</figcaption>
+</figure>
 
 Early versions printed percentages in each cell. The current version draws a **thermal field**:
 
@@ -91,7 +111,10 @@ Overlapping glows blend into a continuous field, like a thermal camera image.
 
 ## Particles without state
 
-![Win burst](../images/win-burst.png){ width="50%" }
+<figure class="single narrow" markdown="span">
+![56 stateless particles, mid-burst](../images/win-burst.png){ loading=lazy }
+<figcaption>56 stateless particles, mid-burst</figcaption>
+</figure>
 
 56 particles, zero particle objects. Each frame:
 

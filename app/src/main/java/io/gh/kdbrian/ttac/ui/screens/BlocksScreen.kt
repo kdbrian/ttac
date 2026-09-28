@@ -88,13 +88,14 @@ import kotlin.random.Random
 @Composable
 fun BlocksScreen(vm: AppViewModel) {
     var difficulty by rememberSaveable { mutableStateOf(BlocksDifficulty.MEDIUM) }
-    // A demo skips the lobby and gives exactly one medium run.
-    var game by remember { mutableStateOf(if (vm.demoMode) BlocksGame(BlocksDifficulty.MEDIUM) else null) }
+    // A resumed run comes back paused; a demo skips the lobby and gives exactly one medium run.
+    val restored = remember { (vm.consumeRestore() as? io.gh.kdbrian.ttac.data.SavedSession.Blocks)?.let { BlocksGame.restore(it.snapshot) } }
+    var game by remember { mutableStateOf(restored ?: if (vm.demoMode) BlocksGame(BlocksDifficulty.MEDIUM) else null) }
     val g = game
     if (g == null) {
         BlocksLobby(vm, difficulty, { difficulty = it }) { game = BlocksGame(difficulty, Random.Default) }
     } else {
-        BlocksPlay(vm, g, onRestart = { game = BlocksGame(g.difficulty) }, onLobby = { game = null; vm.arcadeHeat = 0f })
+        BlocksPlay(vm, g, startPaused = g === restored, onRestart = { game = BlocksGame(g.difficulty) }, onLobby = { game = null; vm.arcadeHeat = 0f })
     }
 }
 
@@ -134,11 +135,21 @@ private fun BlocksLobby(vm: AppViewModel, difficulty: BlocksDifficulty, onDiffic
 }
 
 @Composable
-private fun BlocksPlay(vm: AppViewModel, g: BlocksGame, onRestart: () -> Unit, onLobby: () -> Unit) {
+private fun BlocksPlay(vm: AppViewModel, g: BlocksGame, startPaused: Boolean, onRestart: () -> Unit, onLobby: () -> Unit) {
     val palette = LocalPalette.current
     val stats by vm.stats.collectAsStateWithLifecycle()
     var frame by remember(g) { mutableIntStateOf(0) }
-    var paused by remember(g) { mutableStateOf(false) }
+    var paused by remember(g) { mutableStateOf(startPaused) }
+    // Pause the moment the app loses focus; save the run so it can be resumed from home.
+    val pausesAtStart = remember(g) { vm.pauseSignal }
+    LaunchedEffect(vm.pauseSignal) { if (vm.pauseSignal != pausesAtStart) paused = true }
+    androidx.compose.runtime.DisposableEffect(g) {
+        vm.registerSaver {
+            if (g.over || vm.demoMode) null
+            else io.gh.kdbrian.ttac.data.SavedSession.Blocks(System.currentTimeMillis(), g.snapshot())
+        }
+        onDispose { vm.registerSaver(null) }
+    }
     val scope = rememberCoroutineScope()
     val flash = remember(g) { Animatable(0f) }
     val thump = remember(g) { Animatable(0f) }

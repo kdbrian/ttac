@@ -4,9 +4,24 @@ An ✕ that *draws itself* stroke by stroke — and an ◯ that sweeps round —
 chapter builds it from scratch, in `ui/draw/Marks.kt`. Every picture below is the real board, frozen at a moment of
 its animation by a screenshot test.
 
-| 80 ms | 180 ms | 300 ms | 700 ms |
-|---|---|---|---|
-| ![](../images/mark-frame-80.png) | ![](../images/mark-frame-180.png) | ![](../images/mark-frame-300.png) | ![](../images/mark-frame-700.png) |
+<div class="shots strip" markdown>
+<figure markdown="span">
+![80 ms](../images/crop/mark-80.png){ loading=lazy }
+<figcaption>80 ms</figcaption>
+</figure>
+<figure markdown="span">
+![180 ms](../images/crop/mark-180.png){ loading=lazy }
+<figcaption>180 ms</figcaption>
+</figure>
+<figure markdown="span">
+![300 ms](../images/crop/mark-300.png){ loading=lazy }
+<figcaption>300 ms</figcaption>
+</figure>
+<figure markdown="span">
+![700 ms](../images/crop/mark-700.png){ loading=lazy }
+<figcaption>700 ms</figcaption>
+</figure>
+</div>
 
 Two animations run per mark: a **stroke** (how much of the shape is drawn) and a **pop** (a bouncy scale). At
 80 ms the ✕'s first stroke has barely left its corner and the mark is still small; by 300 ms the first stroke is
@@ -57,9 +72,20 @@ speed setting.
 
 ## Three styles from one geometry
 
-| Neon | Solid | Sketch |
-|---|---|---|
-| ![](../images/style-neon.png) | ![](../images/style-solid.png) | ![](../images/style-sketch.png) |
+<div class="shots" markdown>
+<figure markdown="span">
+![Neon](../images/style-neon.png){ loading=lazy }
+<figcaption>Neon</figcaption>
+</figure>
+<figure markdown="span">
+![Solid](../images/style-solid.png){ loading=lazy }
+<figcaption>Solid</figcaption>
+</figure>
+<figure markdown="span">
+![Sketch](../images/style-sketch.png){ loading=lazy }
+<figcaption>Sketch</figcaption>
+</figure>
+</div>
 
 - **Neon** glows (below).
 - **Solid** draws the path twice: a translucent black copy offset down-right as a shadow, then the colour.
@@ -70,7 +96,10 @@ speed setting.
 
 ## How the neon glow is built
 
-![Neon mid-stroke](../images/style-neon-mid.png){ width="50%" }
+<figure class="single narrow" markdown="span">
+![Neon mid-stroke: the glow follows the pen tip exactly](../images/style-neon-mid.png){ loading=lazy }
+<figcaption>Neon mid-stroke: the glow follows the pen tip exactly</figcaption>
+</figure>
 
 There's no blur filter. Glow is four strokes of the *same* path, widest and faintest first:
 

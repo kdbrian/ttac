@@ -1,9 +1,22 @@
-# 19. LAN multiplayer 🔴
+# 21. LAN multiplayer 🔴
 
 Two phones on the same Wi-Fi play each other with no server (`net/`). This chapter covers discovery, the socket
 protocol, treating the network as hostile, and hiding addresses behind friendly names.
 
-![LAN lobby](../images/screen-lan.png){ width="35%" }
+<div class="shots" markdown>
+<figure markdown="span">
+![Your lasting alias](../images/crop/lan-identity.png){ loading=lazy }
+<figcaption>Your lasting alias</figcaption>
+</figure>
+<figure markdown="span">
+![Host a session](../images/crop/lan-host.png){ loading=lazy }
+<figcaption>Host a session</figcaption>
+</figure>
+<figure markdown="span">
+![Join: discovery, session code, or scan a QR](../images/crop/lan-join.png){ loading=lazy }
+<figcaption>Join: discovery, session code, or scan a QR</figcaption>
+</figure>
+</div>
 
 ## Architecture
 
@@ -65,7 +78,10 @@ Players never see IP addresses:
   finder eyes, with no backing card; on dark themes it's an inverted (light-on-dark) QR, which the in-app scanner
   decodes with `ALSO_INVERTED`.
 
-![QR code](../images/qr.png){ width="30%" }
+<figure class="single narrow" markdown="span">
+![The join QR: rounded dots, soft finder eyes, no backing card](../images/qr.png){ loading=lazy }
+<figcaption>The join QR: rounded dots, soft finder eyes, no backing card</figcaption>
+</figure>
 
 ## Going further
 

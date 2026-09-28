@@ -37,6 +37,8 @@ import io.gh.kdbrian.ttac.data.Unlocks
 import io.gh.kdbrian.ttac.ui.components.BouncyButton
 import io.gh.kdbrian.ttac.ui.components.SectionLabel
 import io.gh.kdbrian.ttac.ui.draw.ArcadeArt
+import io.gh.kdbrian.ttac.ui.draw.ludoBoardBackground
+import androidx.compose.foundation.layout.Box
 import io.gh.kdbrian.ttac.ui.draw.tones
 import androidx.compose.foundation.layout.height
 import io.gh.kdbrian.ttac.ui.components.RoundAction
@@ -89,7 +91,28 @@ fun HomeScreen(vm: AppViewModel) {
             Txt("TTac", Type.display, modifier = Modifier.popIn(100))
             Txt("draw · bounce · burn the line", Type.label, palette.textDim, Modifier.popIn(150))
         }
-        Gap(40)
+        // Pick up the last unfinished game — saved automatically when the app was left.
+        val saved by vm.sessions.saved.collectAsStateWithLifecycle()
+        saved?.let { s ->
+            Gap(20)
+            Panel(
+                Modifier.fillMaxWidth().popIn(120).bouncyClick { vm.resume() },
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                highlight = palette.good.copy(alpha = 0.8f),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBubble(Glyph.PLAY, { vm.resume() }, tint = palette.good, label = "Continue")
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Txt("CONTINUE WHERE YOU LEFT OFF", Type.label, palette.good)
+                        Txt(s.summary, Type.body.copy(fontWeight = FontWeight.Bold), maxLines = 2)
+                    }
+                    IconBubble(Glyph.CLOSE, { vm.discardSession() }, size = 36.dp, tint = palette.textDim, label = "Discard saved game")
+                }
+            }
+            Gap(10)
+        }
+        Gap(30)
 
         // Modes: the headline mode sits in the middle, bigger, with a breathing halo.
         Row(
@@ -114,6 +137,23 @@ fun HomeScreen(vm: AppViewModel) {
                     Txt(if (solo.streak > 0) "On a ${solo.streak}-win streak" else "Best streak ${solo.bestStreak}", Type.label.copy(letterSpacing = 0.sp), palette.textDim)
                 }
                 GlyphIcon(Glyph.BACK, palette.textDim, Modifier.graphicsLayer { rotationZ = 180f }, size = 18.dp)
+            }
+        }
+
+        SectionLabel("Board games")
+        Panel(
+            Modifier.fillMaxWidth().popIn(360).bouncyClick { vm.openLudoLobby() },
+            contentPadding = PaddingValues(14.dp),
+            highlight = Color(0xFFE8B84A).copy(alpha = 0.7f),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(76.dp).ludoBoardBackground())
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
+                    Txt("Ludo Palace", Type.body.copy(fontWeight = FontWeight.ExtraBold, fontSize = 17.sp))
+                    Txt("2–4 players, CPUs, this phone or LAN. Win a Tic-Tac-Toe duel to roll the die.", Type.label.copy(letterSpacing = 0.sp, fontSize = 12.sp), palette.textDim)
+                }
+                Txt("PLAY", Type.label, Color(0xFFE8B84A))
             }
         }
 

@@ -28,7 +28,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-enum class Screen { HOME, SOLO_SETUP, LOCAL_SETUP, LAN, GAME, SCOREBOARD, AWARDS, SETTINGS, BLOCKS, HIVE }
+enum class Screen { HOME, SOLO_SETUP, LOCAL_SETUP, LAN, GAME, SCOREBOARD, AWARDS, SETTINGS, BLOCKS, HIVE, LUDO_LOBBY, LUDO }
+
+/** Screens that hold a game worth saving when the player leaves or the app is backgrounded. */
+private val GAME_SCREENS = setOf(Screen.GAME, Screen.BLOCKS, Screen.HIVE, Screen.LUDO)
 
 /** Something worth a full-screen moment. */
 sealed interface Celebration {
@@ -42,6 +45,15 @@ class AppViewModel(app: Application) : AndroidViewModel(app), MatchHost {
     val statsRepo = StatsRepository(app, viewModelScope)
     private val fx = Fx(app)
     val lan = LanSession(app)
+    val sessions = io.gh.kdbrian.ttac.data.SessionStore(app, viewModelScope)
+    val ludoLink = io.gh.kdbrian.ttac.net.LudoLink(app)
+    val ludo = LudoController(
+        scope = viewModelScope,
+        link = ludoLink,
+        fx = { fx.play(it) },
+        onDuelWon = { statsRepo.recordLudoDuel() },
+        onGameOver = { won -> statsRepo.recordLudoGame(won) },
+    )
 
     val settings: StateFlow<Settings> = settingsRepo.settings.stateIn(viewModelScope, SharingStarted.Eagerly, Settings())
     val stats = statsRepo.stats
@@ -96,6 +108,12 @@ class AppViewModel(app: Application) : AndroidViewModel(app), MatchHost {
             }
         }
         viewModelScope.launch { lan.messages.collect { msg -> match?.onRemote(msg) } }
+        viewModelScope.launch { ludoLink.inbox.collect { (from, m) -> ludo.onWire(from, m) } }
+        viewModelScope.launch {
+            ludoLink.status.collect { st ->
+                if (st is io.gh.kdbrian.ttac.net.LudoLinkStatus.Hosting) ludo.onGuestsChanged(st.guests)
+            }
+        }
         viewModelScope.launch {
             statsRepo.newAwards.collect { awards ->
                 // Let the win line finish burning before the medal drops in.
@@ -124,8 +142,14 @@ class AppViewModel(app: Application) : AndroidViewModel(app), MatchHost {
     fun back(): Boolean {
         if (backStack.size <= 1) return false
         forward = false
+        // Leaving a game mid-way keeps it resumable from the home screen.
+        if (screen in GAME_SCREENS) saveSession()
         val leaving = backStack.removeAt(backStack.lastIndex)
         if (leaving == Screen.GAME) endMatch()
+        if (leaving == Screen.LUDO || leaving == Screen.LUDO_LOBBY) {
+            ludoLink.close()
+            ludo.reset(defaultLudoName())
+        }
         if (leaving == Screen.BLOCKS || leaving == Screen.HIVE) {
             arcadeHeat = 0f
             demoMode = false
@@ -152,6 +176,101 @@ class AppViewModel(app: Application) : AndroidViewModel(app), MatchHost {
     fun resetScores() = statsRepo.resetScores()
 
     fun tapSound() = fx.play(Sfx.TAP)
+
+    // ---- Pause, save & resume ---------------------------------------------------------------
+
+    /** Bumped whenever the app loses focus; running games (Blocks) pause on it. */
+    var pauseSignal by mutableStateOf(0); private set
+
+    /** The screen that's showing a game registers how to snapshot it. */
+    private var saver: (() -> io.gh.kdbrian.ttac.data.SavedSession?)? = null
+
+    fun registerSaver(s: (() -> io.gh.kdbrian.ttac.data.SavedSession?)?) { saver = s }
+
+    /** A session waiting to be picked up by the screen being opened (Blocks, Hive). */
+    var pendingRestore: io.gh.kdbrian.ttac.data.SavedSession? = null; private set
+
+    fun consumeRestore(): io.gh.kdbrian.ttac.data.SavedSession? = pendingRestore.also { pendingRestore = null }
+
+    /** Called when the app goes to the background: pause, and save whatever is in progress. */
+    fun onAppPaused() {
+        pauseSignal++
+        saveSession()
+    }
+
+    private fun saveSession() {
+        val snap = when (screen) {
+            Screen.GAME -> matchSnapshot()
+            Screen.LUDO -> ludo.state?.takeIf { ludo.resumable }?.let { io.gh.kdbrian.ttac.data.SavedSession.Ludo(System.currentTimeMillis(), it) }
+            Screen.BLOCKS, Screen.HIVE -> saver?.invoke()
+            else -> return
+        }
+        if (snap != null) sessions.save(snap)
+    }
+
+    private fun matchSnapshot(): io.gh.kdbrian.ttac.data.SavedSession? {
+        val m = match ?: return null
+        val c = m.config
+        if (c.mode == GameMode.LAN) return null
+        return io.gh.kdbrian.ttac.data.SavedSession.TicTacToe(
+            savedAt = System.currentTimeMillis(), mode = c.mode, size = c.size, difficulty = c.difficulty,
+            xName = c.x.player.name, oName = c.o.player.name, xId = c.x.player.id, oId = c.o.player.id,
+            xColor = c.x.player.color, oColor = c.o.player.color,
+            xKind = c.x.kind.name, oKind = c.o.kind.name,
+            board = m.board.encode(), turn = m.turn, round = m.round,
+            xWins = m.xWins, oWins = m.oWins, draws = m.draws,
+        )
+    }
+
+    /** Picks up the last unfinished game exactly where it was left. */
+    fun resume() {
+        val s = sessions.saved.value ?: return
+        sessions.clear()
+        fx.play(Sfx.TAP)
+        forward = true
+        when (s) {
+            is io.gh.kdbrian.ttac.data.SavedSession.TicTacToe -> {
+                val x = Seat(PlayerRef(s.xId, s.xName, s.xColor), SeatKind.valueOf(s.xKind))
+                val o = Seat(PlayerRef(s.oId, s.oName, s.oColor), SeatKind.valueOf(s.oKind))
+                begin(MatchConfig(s.mode, s.size, x, o, s.difficulty))
+                match?.restore(io.gh.kdbrian.ttac.game.Board.decode(s.board), s.turn, s.round, s.xWins, s.oWins, s.draws)
+                backStack.add(Screen.GAME)
+            }
+            is io.gh.kdbrian.ttac.data.SavedSession.Blocks -> { pendingRestore = s; backStack.add(Screen.BLOCKS) }
+            is io.gh.kdbrian.ttac.data.SavedSession.Hive -> { pendingRestore = s; backStack.add(Screen.HIVE) }
+            is io.gh.kdbrian.ttac.data.SavedSession.Ludo -> { ludo.restore(s.state); backStack.add(Screen.LUDO) }
+        }
+    }
+
+    fun discardSession() = sessions.clear()
+
+    // ---- Ludo -------------------------------------------------------------------------------
+
+    private fun defaultLudoName(): String = stats.value.profiles.firstOrNull()?.name ?: "You"
+
+    fun openLudoLobby() {
+        ludo.reset(defaultLudoName())
+        go(Screen.LUDO_LOBBY)
+    }
+
+    fun hostLudo() = ludo.beginHosting(myAlias(), defaultLudoName())
+
+    fun joinLudo(address: String, port: Int, alias: String) {
+        ludo.becomeGuest()
+        val me = stats.value.profiles.firstOrNull()
+        ludoLink.join(address, port, alias, io.gh.kdbrian.ttac.net.LudoWire.Join(me?.name ?: "Guest", myAlias(), me?.color ?: 0xFF33E1FF))
+    }
+
+    /** Swap the lobby for the table once a game exists. */
+    fun openLudoTable() {
+        if (screen == Screen.LUDO_LOBBY) {
+            forward = true
+            val i = backStack.lastIndex
+            backStack[i] = Screen.LUDO
+        }
+    }
+
+    fun ludoRematch() = ludo.rematch()
 
     /** Opens an unlocked arcade game straight from its celebration. */
     fun openArcade(game: io.gh.kdbrian.ttac.data.ArcadeGame) {

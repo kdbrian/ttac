@@ -1,4 +1,4 @@
-# 20. Testing & screenshot tests 🔴
+# 22. Testing & screenshot tests 🔴
 
 TTac has three kinds of tests, each at the cheapest level that can catch its bugs.
 
@@ -42,9 +42,24 @@ rule.mainClock.advanceTimeBy(180)                  // exactly 180 ms into the an
 rule.onRoot().captureRoboImage("docs/images/mark-frame-180.png")
 ```
 
-| advanceTimeBy(80) | (180) | (300) | (700) |
-|---|---|---|---|
-| ![](../images/mark-frame-80.png) | ![](../images/mark-frame-180.png) | ![](../images/mark-frame-300.png) | ![](../images/mark-frame-700.png) |
+<div class="shots strip" markdown>
+<figure markdown="span">
+![advanceTimeBy(80)](../images/crop/mark-80.png){ loading=lazy }
+<figcaption>advanceTimeBy(80)</figcaption>
+</figure>
+<figure markdown="span">
+![advanceTimeBy(180)](../images/crop/mark-180.png){ loading=lazy }
+<figcaption>advanceTimeBy(180)</figcaption>
+</figure>
+<figure markdown="span">
+![advanceTimeBy(300)](../images/crop/mark-300.png){ loading=lazy }
+<figcaption>advanceTimeBy(300)</figcaption>
+</figure>
+<figure markdown="span">
+![advanceTimeBy(700)](../images/crop/mark-700.png){ loading=lazy }
+<figcaption>advanceTimeBy(700)</figcaption>
+</figure>
+</div>
 
 Same composable, same inputs, four moments — a frame-by-frame film strip of a real animation.
 

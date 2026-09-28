@@ -105,13 +105,27 @@ fun HiveScreen(vm: AppViewModel) {
     val palette = LocalPalette.current
     val stats by vm.stats.collectAsStateWithLifecycle()
     val demo = vm.demoMode
+    // A resumed hive comes back exactly as it was left.
+    val restored = remember { vm.consumeRestore() as? io.gh.kdbrian.ttac.data.SavedSession.Hive }
     // A demo is always a fresh level-one hive with throwaway points.
-    val level = if (demo) 1 else stats.hive.level
-    var puzzle by remember(level, demo) { mutableStateOf(HivePuzzle.generate(HiveSpec(level))) }
-    var found by remember(level, demo) { mutableStateOf(setOf<String>()) }
-    var extras by remember(level, demo) { mutableStateOf(setOf<String>()) }
+    val level = restored?.level ?: if (demo) 1 else stats.hive.level
+    var puzzle by remember(level, demo) { mutableStateOf(restored?.let(::puzzleOf) ?: HivePuzzle.generate(HiveSpec(level))) }
+    var found by remember(level, demo) { mutableStateOf(restored?.found?.toSet() ?: setOf()) }
+    var extras by remember(level, demo) { mutableStateOf(restored?.extras?.toSet() ?: setOf()) }
     val foundPaths = remember(level, demo) { mutableStateMapOf<String, List<Hex>>() }
-    val hints = remember(level, demo) { mutableStateMapOf<String, Int>() }
+    val hints = remember(level, demo) { mutableStateMapOf<String, Int>().apply { restored?.hints?.let(::putAll) } }
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        vm.registerSaver {
+            if (demo || (puzzle.words.isNotEmpty() && puzzle.words.all { it.word in found })) null
+            else io.gh.kdbrian.ttac.data.SavedSession.Hive(
+                savedAt = System.currentTimeMillis(), level = level, radius = puzzle.spec.radius,
+                letters = puzzle.letters.map { (h, ch) -> "${h.q},${h.r},$ch" },
+                words = puzzle.words.associate { w -> w.word to w.cells.map { "${it.q},${it.r}" } },
+                found = found.toList(), extras = extras.toList(), hints = hints.toMap(),
+            )
+        }
+        onDispose { vm.registerSaver(null) }
+    }
     var selection by remember(level, demo) { mutableStateOf(emptyList<Hex>()) }
     val foundAnim = remember(level, demo) { mutableStateMapOf<String, Animatable<Float, *>>() }
     var demoPoints by remember(level, demo) { mutableStateOf(0) }
@@ -509,4 +523,12 @@ private fun WordSlots(word: String, found: Boolean, hintLevel: Int, color: Color
             }
         }
     }
+}
+
+/** Rebuilds a saved hive: letters, hidden word paths and all. */
+private fun puzzleOf(saved: io.gh.kdbrian.ttac.data.SavedSession.Hive): HivePuzzle {
+    fun hex(s: String) = s.split(",").let { Hex(it[0].toInt(), it[1].toInt()) }
+    val letters = saved.letters.associate { t -> t.split(",").let { Hex(it[0].toInt(), it[1].toInt()) to it[2].first() } }
+    val words = saved.words.map { (w, cells) -> io.gh.kdbrian.ttac.game.PlacedWord(w, cells.map(::hex)) }
+    return HivePuzzle(HiveSpec(saved.level), letters, words)
 }

@@ -1,4 +1,4 @@
-# 21. Performance report 🔴
+# 23. Performance report 🔴
 
 This chapter records what was measured, what was optimised, and how to reproduce every number.
 
@@ -36,9 +36,9 @@ These are design decisions throughout the codebase; each links to the chapter th
 | **Stateless particles** from a seeded RNG | win burst ([ch. 7](../drawing/effects.md)) | Zero allocation or bookkeeping per particle |
 | **One 60 s clock** for the whole backdrop | `AnimatedBackdrop` ([ch. 8](../drawing/backdrops.md)) | One infinite transition drives blobs, glows and 26 stars |
 | **Layered strokes instead of blur** | neon marks, win line | No `RenderEffect` pass; works on API 26+ |
-| **Pre-rendered sounds** | `Synth.buildAll()` ([ch. 16](../systems/audio.md)) | No synthesis work at the moment of a win |
+| **Pre-rendered sounds** | `Synth.buildAll()` ([ch. 17](../systems/audio.md)) | No synthesis work at the moment of a win |
 | **AI off the main thread** | `Match.maybeRunAi` on `Dispatchers.Default` | Hard 4×4/5×5 search never blocks a frame |
-| **Atomic, mutex-guarded writes on IO** | `StatsRepository` ([ch. 17](../systems/persistence.md)) | Saving never touches the main thread |
+| **Atomic, mutex-guarded writes on IO** | `StatsRepository` ([ch. 18](../systems/persistence.md)) | Saving never touches the main thread |
 | **Remembered geometry** | `Rules.of(size)` caches win lines; `QrCode` remembers its bit matrix | Computed once, not per frame |
 
 ## Startup: Baseline Profiles
@@ -48,8 +48,9 @@ On first launch Android runs app code **interpreted and JIT-compiled**, which is
 `androidx.profileinstaller` use it to compile that code **ahead of time** on install.
 
 TTac's profile generator (`baselineprofile/BaselineProfileGenerator.kt`) drives the real app with UI Automator:
-cold start to the home screen, a solo game with several moves, then every scoreboard tab. The profile is merged into
-release builds, and `profileinstaller` compiles it on devices that don't install from Play.
+cold start to the home screen, a solo game with several moves, every scoreboard tab, then a Blocks run played with
+real gestures. The generated profile holds **16,507 rules** and is merged into release builds; `profileinstaller`
+compiles it on devices that don't install from Play.
 
 ```bash
 ./gradlew :app:generateReleaseBaselineProfile                   # regenerate on an API 33+ device
@@ -62,10 +63,34 @@ release builds, and `profileinstaller` compiles it on devices that don't install
 |---|---|---|
 | `startupNoCompilation` | time to initial & full display | the worst case: no AOT compilation |
 | `startupBaselineProfile` | time to initial & full display | with the profile applied |
-| `soloGameFrames` | frame duration percentiles | smoothness while playing |
+| `soloGameFrames` | frame duration percentiles | smoothness while playing Tic-Tac-Toe |
+| `blocksFrames` | frame duration percentiles | smoothness during ~12 s of Blocks: rotates, drags, hard drops |
+
+Frame timing uses `FrameTimingGfxInfoMetric` (Android's own `dumpsys gfxinfo` frame stats). The trace-based
+`FrameTimingMetric` found no frame-timeline slices on the test phone — Samsung builds don't always emit them.
 
 **Time to full display** is reported by the app itself: `ReportDrawnWhen { stats.profiles.isNotEmpty() }` on the
 home screen marks the moment saved data has loaded and the real UI (not an empty shell) is on screen.
+
+## Startup results (measured)
+
+Samsung Galaxy A32 (SM-A325F), Android 13, 10 cold starts each:
+
+| Compilation | min | median | max |
+|---|---|---|---|
+| None (worst case) | 997 ms | 1,053 ms | 2,421 ms |
+| Baseline Profile | 958 ms | 1,138 ms | 1,277 ms |
+
+**Reading these honestly:**
+
+- The profile **halves the worst case** (2.4 s → 1.3 s) and tightens the spread — the unlucky slow cold starts
+  disappear.
+- The **median didn't improve** in this run (1.05 s → 1.14 s). The phone was at 15–17% battery and couldn't charge
+  past it, so the run was made with Macrobenchmark's low-battery guard suppressed; low battery lets Android throttle
+  the CPU, which adds noise of this size. Treat the median comparison as inconclusive until it's re-run on a charged
+  device.
+- Time to full display equals time to initial display: saved data loads before the first frame finishes, so users
+  never see an empty home screen.
 
 ## Reproducing
 

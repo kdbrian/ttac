@@ -3,7 +3,16 @@
 Blocks (`game/Blocks.kt` + `ui/screens/BlocksScreen.kt`) is an endless falling-block game: pieces fall, you move and
 rotate them, full rows clear, and it speeds up until the stack reaches the top.
 
-![Blocks, captured from a live demo run](../images/screen-blocks.png){ width="40%" }
+<div class="shots two" markdown>
+<figure markdown="span">
+![One HUD row: back, score, lines, level, next piece, pause](../images/crop/blocks-hud.png){ loading=lazy }
+<figcaption>One HUD row: back, score, lines, level, next piece, pause</figcaption>
+</figure>
+<figure markdown="span">
+![The well on the backdrop: a falling O above its ghost, and the control strip](../images/crop/blocks-well.png){ loading=lazy }
+<figcaption>The well on the backdrop: a falling O above its ghost, and the control strip</figcaption>
+</figure>
+</div>
 
 The capture above is a real run: the demo drops straight into play, and the first piece (a yellow O) is falling
 toward its ghost outline — the hollow squares at the floor show exactly where a hard drop would land it. Note the layout — the well sits directly on the animated backdrop, edge to edge, with a single HUD row

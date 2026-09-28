@@ -200,6 +200,21 @@ class Match(
         }
     }
 
+    /** Puts a saved sitting back exactly as it was, then lets the AI continue if it was its move. */
+    fun restore(board: Board, turn: Mark, round: Int, xWins: Int, oWins: Int, draws: Int) {
+        aiJob?.cancel()
+        this.board = board
+        this.turn = turn
+        this.round = round
+        this.xWins = xWins
+        this.oWins = oWins
+        this.draws = draws
+        win = board.winner()
+        isDraw = win == null && board.isDraw()
+        aiThinking = false
+        maybeRunAi()
+    }
+
     fun dispose() {
         aiJob?.cancel()
     }

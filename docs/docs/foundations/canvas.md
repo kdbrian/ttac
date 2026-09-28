@@ -5,7 +5,10 @@ commands. Everything in TTac is built from about a dozen of these commands.
 
 ## Coordinates
 
-![The real board canvas](../images/board-drawin-900.png){ width="50%" }
+<figure class="single narrow" markdown="span">
+![The board canvas: ✕ in cells 0 and 4, ◯ in cell 2](../images/board-drawin-900.png){ loading=lazy }
+<figcaption>The board canvas: ✕ in cells 0 and 4, ◯ in cell 2</figcaption>
+</figure>
 
 - The origin `(0, 0)` is the **top-left** corner.
 - **x grows right, y grows down** — the opposite of maths class for y.
@@ -45,7 +48,10 @@ and a **style**: `Fill` (default) or `Stroke(width, cap, join)`.
 
 ## Strokes: caps and joins
 
-![A mark mid-stroke](../images/mark-frame-180.png){ width="50%" }
+<figure class="single narrow" markdown="span">
+![180 ms in: the ✕'s first stroke has a round leading tip](../images/crop/mark-180.png){ loading=lazy }
+<figcaption>180 ms in: the ✕'s first stroke has a round leading tip</figcaption>
+</figure>
 
 A stroke's **cap** decides how its ends look: `Butt` stops flat at the end point, `Square` extends a half-width
 square past it, and `Round` adds a half-width semicircle. TTac uses `StrokeCap.Round` everywhere — look at the

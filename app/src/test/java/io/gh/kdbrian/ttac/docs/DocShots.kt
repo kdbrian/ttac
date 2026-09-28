@@ -264,4 +264,37 @@ class DocShots {
             CelebrationOverlay(Celebration.MedalWon(MedalAward(Medal.GOLD, "you", "You", 9, 0L)), {}, {})
         }
     }
+
+    // ---- Ludo Palace ----------------------------------------------------------------------------
+
+    /** A seeded game played forward by CPUs until it reaches [phase] with pawns spread around the board. */
+    private fun ludoState(steps: Int, phase: io.gh.kdbrian.ttac.game.LudoPhase): io.gh.kdbrian.ttac.game.LudoState {
+        val rnd = kotlin.random.Random(11)
+        val seats = io.gh.kdbrian.ttac.game.LudoColor.entries.map {
+            io.gh.kdbrian.ttac.game.LudoSeat(it, if (it == io.gh.kdbrian.ttac.game.LudoColor.BLUE) io.gh.kdbrian.ttac.game.SeatKind.LOCAL else io.gh.kdbrian.ttac.game.SeatKind.CPU, if (it == io.gh.kdbrian.ttac.game.LudoColor.BLUE) "Player 1" else "Player ${it.number}")
+        }
+        var st = io.gh.kdbrian.ttac.game.Ludo.newGame(seats, Difficulty.MEDIUM, rnd)
+        var n = 0
+        while ((n < steps || st.phase != phase) && st.phase != io.gh.kdbrian.ttac.game.LudoPhase.OVER && n < steps * 4) {
+            st = io.gh.kdbrian.ttac.game.Ludo.apply(st, io.gh.kdbrian.ttac.game.LudoBot.act(st, rnd)!!, rnd)!!
+            n++
+        }
+        return st
+    }
+
+    @Test fun screenLudoLobby() = screen("screen-ludo-lobby") { io.gh.kdbrian.ttac.ui.screens.LudoLobbyScreen(it) }
+
+    @Test fun screenLudoTable() {
+        val model = vm()
+        model.ludo.restore(ludoState(900, io.gh.kdbrian.ttac.game.LudoPhase.CHOOSE_OPPONENT))
+        screen("screen-ludo", model = model, atMs = 5000) { io.gh.kdbrian.ttac.ui.screens.LudoTableScreen(it) }
+    }
+
+    @Test fun screenLudoDuel() {
+        val model = vm()
+        model.ludo.restore(ludoState(420, io.gh.kdbrian.ttac.game.LudoPhase.DUEL))
+        screen("screen-ludo-duel", model = model, atMs = 5000) { io.gh.kdbrian.ttac.ui.screens.LudoTableScreen(it) }
+    }
+
+    @Test fun palace() = shot("palace", 380, 700, 2000) { io.gh.kdbrian.ttac.ui.draw.PalaceBackdrop(Modifier.fillMaxSize()) }
 }

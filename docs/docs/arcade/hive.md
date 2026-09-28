@@ -4,7 +4,16 @@ Word Hive (`game/WordHive.kt` + `ui/screens/HiveScreen.kt`) hides words in a hon
 each traced word is **accepted** (a hidden target), counted as an **extra** (a real word that isn't a target), or
 **rejected**.
 
-![Word Hive](../images/screen-hive.png){ width="40%" }
+<div class="shots two" markdown>
+<figure markdown="span">
+![Points, shuffle, hint (with its cost) and the target words as letter boxes](../images/crop/hive-top.png){ loading=lazy }
+<figcaption>Points, shuffle, hint (with its cost) and the target words as letter boxes</figcaption>
+</figure>
+<figure markdown="span">
+![A radius-2 hive: 19 cells](../images/crop/hive-board.png){ loading=lazy }
+<figcaption>A radius-2 hive: 19 cells</figcaption>
+</figure>
+</div>
 
 In the capture: the honey-coin points counter, shuffle and hint buttons (the hint shows its cost), the target words
 as rows of empty letter boxes, and a radius-2 hive of 19 cells.

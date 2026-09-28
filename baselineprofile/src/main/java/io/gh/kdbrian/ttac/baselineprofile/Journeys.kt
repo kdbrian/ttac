@@ -42,3 +42,33 @@ fun MacrobenchmarkScope.browseScores() {
     }
     device.pressBack()
 }
+
+/**
+ * Opens Blocks from the home screen's Arcade section, starts a run and plays it with real gestures for
+ * [seconds]: rotate taps, left/right drags and hard-drop flicks. Needs Blocks unlocked on the device.
+ */
+fun MacrobenchmarkScope.playBlocks(seconds: Int = 12) {
+    val w = device.displayWidth
+    val h = device.displayHeight
+    // The arcade cards sit below the fold.
+    device.swipe(w / 2, (h * 0.8f).toInt(), w / 2, (h * 0.25f).toInt(), 20)
+    device.wait(Until.hasObject(By.text("Blocks")), TIMEOUT)
+    device.findObject(By.text("Blocks"))?.click() ?: return
+    device.wait(Until.hasObject(By.text("Start")), TIMEOUT)
+    device.findObject(By.text("Start"))?.click() ?: return
+    Thread.sleep(600)
+    val end = System.currentTimeMillis() + seconds * 1000L
+    var i = 0
+    while (System.currentTimeMillis() < end) {
+        when (i % 4) {
+            0 -> device.click(w / 2, h / 2)                                                    // rotate
+            1 -> device.swipe(w / 2, h / 2, w / 2 - w / 5, h / 2, 6)                            // drag left
+            2 -> device.swipe(w / 2, h / 2, w / 2 + w / 5, h / 2, 6)                            // drag right
+            else -> device.swipe(w / 2, (h * 0.35f).toInt(), w / 2, (h * 0.75f).toInt(), 3)   // flick = hard drop
+        }
+        Thread.sleep(250)
+        i++
+    }
+    device.pressBack()
+    device.wait(Until.hasObject(By.desc("Solo vs AI")), TIMEOUT)
+}

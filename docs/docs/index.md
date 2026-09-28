@@ -8,13 +8,29 @@ Everything you see in TTac is drawn with Jetpack Compose's `Canvas`: marks, boar
 the icons. Sounds are synthesised in code. That makes it an unusually complete teaching project — every pixel and
 every sound has source you can read.
 
-<figure markdown>
-![Home screen](images/screen-home.png){ width="30%" }
-![A game in progress](images/screen-game.png){ width="30%" }
-![Awards](images/screen-awards.png){ width="30%" }
-<figcaption>Every image in this guide is rendered by a screenshot test (Roborazzi) from the real code — so it is
-always current.</figcaption>
+<figure class="single" markdown="span">
+![TTac's home screen](images/crop/home-hero.png#only-dark){ loading=lazy }
+![TTac's home screen](images/crop/home-hero-light.png#only-light){ loading=lazy }
+<figcaption>TTac's home screen — the app follows the same light/dark theme as this page</figcaption>
 </figure>
+
+<div class="shots" markdown>
+<figure markdown="span">
+![A game in progress](images/crop/game-board.png){ loading=lazy }
+<figcaption>A game in progress</figcaption>
+</figure>
+<figure markdown="span">
+![Streak meters](images/crop/awards-meters.png){ loading=lazy }
+<figcaption>Streak meters</figcaption>
+</figure>
+<figure markdown="span">
+![Word Hive](images/crop/hive-board.png){ loading=lazy }
+<figcaption>Word Hive</figcaption>
+</figure>
+</div>
+
+Every image in this guide is captured by a screenshot test (Roborazzi) from the app's real composables, then cropped
+to the part being discussed — so it is always current.
 
 ## How to read this guide
 
@@ -25,8 +41,8 @@ the exact TTac code, then finishes with a "going further" section for experience
 |---|---|---|
 | 🟢 Beginner | 1–3 | Project setup, how Compose thinks, and drawing your first shapes on a Canvas |
 | 🟡 Intermediate | 4–9 | Drawing and animating game pieces, springs, gradients, glows, particles, a UI kit |
-| 🟠 Advanced | 10–15 | Pure game rules, minimax AI with alpha-beta, state machines, gestures, a falling-block engine, hex grids |
-| 🔴 Pro | 16–22 | Sound synthesis, persistence with reducers, progression systems, LAN networking, screenshot testing, Baseline Profiles, CI/CD |
+| 🟠 Advanced | 10–16 | Pure game rules, minimax AI with alpha-beta, state machines, gestures, a falling-block engine, hex grids |
+| 🔴 Pro | 17–24 | Sound synthesis, persistence with reducers, pause & resume, progression systems, LAN networking, screenshot testing, Baseline Profiles, CI/CD |
 
 !!! tip "Follow along"
     Clone the repo and open it in Android Studio. Every chapter names the files it discusses, e.g.

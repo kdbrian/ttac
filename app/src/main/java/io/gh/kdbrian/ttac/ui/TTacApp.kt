@@ -56,6 +56,16 @@ fun TTacApp(vm: AppViewModel = viewModel()) {
             activity?.enableEdgeToEdge(style, style)
         }
 
+        // Leaving the app (home button, app switcher, screen off, a call) pauses and saves the game.
+        val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+        androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+            val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                if (event == androidx.lifecycle.Lifecycle.Event.ON_PAUSE) vm.onAppPaused()
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        }
+
         BackHandler(enabled = vm.celebrations.isNotEmpty()) { vm.dismissCelebration() }
         BackHandler(enabled = vm.screen != Screen.HOME && vm.celebrations.isEmpty()) { vm.back() }
 
@@ -97,6 +107,8 @@ fun TTacApp(vm: AppViewModel = viewModel()) {
                     Screen.AWARDS -> AwardsScreen(vm)
                     Screen.BLOCKS -> BlocksScreen(vm)
                     Screen.HIVE -> HiveScreen(vm)
+                    Screen.LUDO_LOBBY -> io.gh.kdbrian.ttac.ui.screens.LudoLobbyScreen(vm)
+                    Screen.LUDO -> io.gh.kdbrian.ttac.ui.screens.LudoTableScreen(vm)
                     Screen.SETTINGS -> SettingsScreen(vm)
                 }
             }

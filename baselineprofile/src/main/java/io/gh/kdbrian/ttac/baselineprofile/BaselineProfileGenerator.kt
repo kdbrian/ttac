@@ -24,5 +24,6 @@ class BaselineProfileGenerator {
         startAndWaitForHome()
         playSoloRound()
         browseScores()
+        playBlocks()
     }
 }

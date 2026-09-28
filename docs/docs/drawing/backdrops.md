@@ -3,9 +3,24 @@
 The app never shows a flat background. `AnimatedBackdrop` (`ui/draw/Decor.kt`) layers a gradient, organic blobs,
 drifting glows, a player tint and a starfield of ✕ and ◯ — all on one Canvas driven by a single 60-second clock.
 
-| At 2 s | At 4 s | Tinted to ✕ on turn | Light theme |
-|---|---|---|---|
-| ![](../images/backdrop-2s.png) | ![](../images/backdrop-4s.png) | ![](../images/backdrop-tint.png) | ![](../images/backdrop-light.png) |
+<div class="shots strip" markdown>
+<figure markdown="span">
+![At 2 s](../images/backdrop-2s.png){ loading=lazy }
+<figcaption>At 2 s</figcaption>
+</figure>
+<figure markdown="span">
+![At 4 s](../images/backdrop-4s.png){ loading=lazy }
+<figcaption>At 4 s</figcaption>
+</figure>
+<figure markdown="span">
+![Tinted to ✕ on turn](../images/backdrop-tint.png){ loading=lazy }
+<figcaption>Tinted to ✕ on turn</figcaption>
+</figure>
+<figure markdown="span">
+![Light theme](../images/backdrop-light.png){ loading=lazy }
+<figcaption>Light theme</figcaption>
+</figure>
+</div>
 
 Compare the first two captures of the same backdrop two seconds apart: some stars have faded out, new ones have
 appeared elsewhere, and the blobs' edges have shifted.

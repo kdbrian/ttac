@@ -50,6 +50,9 @@ markdown_extensions:
   - pymdownx.arithmatex: { generic: true }
   - pymdownx.tabbed: { alternate_style: true }
 
+extra_css:
+  - stylesheets/extra.css
+
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
@@ -74,13 +77,15 @@ nav:
   - Arcade:
       - 14. Blocks — a falling-block engine: arcade/blocks.md
       - 15. Word Hive — hex grids & generation: arcade/hive.md
+      - 16. Ludo Palace — duels & multi-phone LAN: arcade/ludo.md
   - Systems:
-      - 16. Sound synthesis & haptics: systems/audio.md
-      - 17. Persistence & reducers: systems/persistence.md
-      - 18. Progression — streaks, medals, unlocks: systems/progression.md
-      - 19. LAN multiplayer: systems/networking.md
+      - 17. Sound synthesis & haptics: systems/audio.md
+      - 18. Persistence & reducers: systems/persistence.md
+      - 19. Pause, save & resume: systems/sessions.md
+      - 20. Progression — streaks, medals, unlocks: systems/progression.md
+      - 21. LAN multiplayer: systems/networking.md
   - Shipping:
-      - 20. Testing & screenshot tests: shipping/testing.md
-      - 21. Performance report: shipping/performance.md
-      - 22. CI/CD & releases: shipping/ci-cd.md
+      - 22. Testing & screenshot tests: shipping/testing.md
+      - 23. Performance report: shipping/performance.md
+      - 24. CI/CD & releases: shipping/ci-cd.md
   - API reference: api/index.html

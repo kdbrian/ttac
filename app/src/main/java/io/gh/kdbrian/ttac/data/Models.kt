@@ -189,6 +189,17 @@ data class HiveStats(
 )
 
 @Serializable
+data class LudoStats(val played: Int = 0, val wins: Int = 0, val duelsWon: Int = 0)
+
+/** Ludo rewards: winning the game pays most; every game and every duel won pays a little. */
+object LudoRewards {
+    const val WIN_COINS = 300
+    const val WIN_GEMS = 5
+    const val PLAY_COINS = 50
+    const val DUEL_COINS = 10
+}
+
+@Serializable
 data class MedalAward(
     val medal: Medal,
     val ownerId: String,
@@ -220,6 +231,10 @@ data class StatsData(
     val demosUsed: List<ArcadeGame> = emptyList(),
     val blocks: BlocksStats = BlocksStats(),
     val hive: HiveStats = HiveStats(),
+    /** Soft currency shown in the Ludo top bar; everyone starts with a small purse. */
+    val coins: Int = 1000,
+    val gems: Int = 10,
+    val ludo: LudoStats = LudoStats(),
 ) {
     fun isUnlocked(game: ArcadeGame) = game in unlocked
     fun canDemo(game: ArcadeGame) = !isUnlocked(game) && game !in demosUsed

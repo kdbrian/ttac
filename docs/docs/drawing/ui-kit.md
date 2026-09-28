@@ -3,7 +3,28 @@
 TTac doesn't use Material components. Its UI kit (`ui/components/Components.kt`) is built from modifiers,
 `drawBehind` and small canvases — which is how it gets a consistent bouncy, glassy look.
 
-![Components](../images/components.png){ width="70%" }
+<div class="shots two" markdown>
+<figure markdown="span">
+![Pill buttons: solid, glass, compact](../images/crop/ui-buttons.png){ loading=lazy }
+<figcaption>Pill buttons: solid, glass, compact</figcaption>
+</figure>
+<figure markdown="span">
+![Icon bubbles, avatars, switches](../images/crop/ui-icons.png){ loading=lazy }
+<figcaption>Icon bubbles, avatars, switches</figcaption>
+</figure>
+<figure markdown="span">
+![Segmented picker](../images/crop/ui-segmented.png){ loading=lazy }
+<figcaption>Segmented picker</figcaption>
+</figure>
+<figure markdown="span">
+![Canvas slider](../images/crop/ui-slider.png){ loading=lazy }
+<figcaption>Canvas slider</figcaption>
+</figure>
+<figure markdown="span">
+![Glass panel](../images/crop/ui-panel.png){ loading=lazy }
+<figcaption>Glass panel</figcaption>
+</figure>
+</div>
 
 ## Glass
 
@@ -46,20 +67,62 @@ The thumb position springs between options; while it's moving, its width grows b
 
 ## Icons as strokes
 
-![Glyphs](../images/glyphs.png){ width="80%" }
+<figure class="single" markdown="span">
+![Every Glyph in the app, drawn with strokes](../images/glyphs.png){ loading=lazy }
+<figcaption>Every Glyph in the app, drawn with strokes</figcaption>
+</figure>
 
 Every icon is a `Glyph` enum drawn with lines, arcs and small paths in a unit square (`drawGlyph`). No vector
 drawables, and icons inherit colour and scale for free.
 
 ## Avatars, medals and art
 
-| Medals | Locked | Arcade art |
-|---|---|---|
-| ![](../images/medals.png) | ![](../images/medals-locked.png) | ![](../images/arcade-art.png) |
+<div class="shots" markdown>
+<figure markdown="span">
+![Medals](../images/medals.png){ loading=lazy }
+<figcaption>Medals</figcaption>
+</figure>
+<figure markdown="span">
+![Locked](../images/medals-locked.png){ loading=lazy }
+<figcaption>Locked</figcaption>
+</figure>
+<figure markdown="span">
+![Arcade art](../images/arcade-art.png){ loading=lazy }
+<figcaption>Arcade art</figcaption>
+</figure>
+</div>
 
 Medals combine every technique so far: a two-tail ribbon path, a disc with a reversed inner gradient (bevel), an
 emblem (star with tier pips, shield with chevrons, comeback arrow), and a **shine**: a white diagonal bar swept across
 the disc inside `clipPath(disc)`. Locked medals drop to 28% alpha with a dashed rim.
+
+## Light & dark themes
+
+Every colour comes from a `Palette` (`ui/theme/Theme.kt`) provided through a `CompositionLocal`, so the same
+components render in either theme without a single `if (dark)` in screen code. The page you're reading follows your
+system theme too — flip it with the toggle in the top bar and the screenshots below follow.
+
+<figure class="single" markdown="span">
+![Home](../images/crop/home-hero.png#only-dark){ loading=lazy }
+![Home](../images/crop/home-hero-light.png#only-light){ loading=lazy }
+<figcaption>Home — the app follows the same light/dark theme as this page</figcaption>
+</figure>
+
+<div class="shots two" markdown>
+<figure class="single" markdown="span">
+![Mode buttons](../images/crop/home-modes.png#only-dark){ loading=lazy }
+![Mode buttons](../images/crop/home-modes-light.png#only-light){ loading=lazy }
+<figcaption>Mode buttons</figcaption>
+</figure>
+<figure class="single" markdown="span">
+![Arcade cards](../images/crop/home-arcade.png#only-dark){ loading=lazy }
+![Arcade cards](../images/crop/home-arcade-light.png#only-light){ loading=lazy }
+<figcaption>Arcade cards</figcaption>
+</figure>
+</div>
+
+The light palette isn't the dark one inverted: it's warm paper with a darker grid and its own heat ramp, tuned so
+glows still read on a bright background.
 
 ## Typography
 

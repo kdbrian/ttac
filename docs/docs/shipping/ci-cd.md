@@ -1,4 +1,4 @@
-# 22. CI/CD & releases 🔴
+# 24. CI/CD & releases 🔴
 
 Two GitHub Actions workflows, each with one clear job.
 

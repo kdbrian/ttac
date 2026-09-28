@@ -1,0 +1,33 @@
+/* Screenshot galleries: tidy grids of cropped captures that reflow on narrow screens. */
+.md-typeset .shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem;
+  align-items: start;
+  margin: 1.2em 0;
+}
+.md-typeset .shots.two { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.md-typeset .shots.strip { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
+.md-typeset .shots figure { margin: 0; max-width: none; }
+.md-typeset .shots img,
+.md-typeset img.shot {
+  border-radius: 14px;
+  box-shadow: 0 6px 22px rgb(0 0 0 / 0.28);
+  width: 100%;
+  height: auto;
+}
+.md-typeset .shots figcaption,
+.md-typeset figure.single figcaption {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin-top: 0.45em;
+  opacity: 0.8;
+}
+.md-typeset figure.single { margin: 1.2em auto; max-width: 560px; }
+.md-typeset figure.single.narrow { max-width: 340px; }
+.md-typeset figure.single img { border-radius: 16px; box-shadow: 0 8px 26px rgb(0 0 0 / 0.3); }
+/* Phone-shaped full screens. */
+.md-typeset .phone img { border-radius: 28px; }
+@media screen and (max-width: 600px) {
+  .md-typeset .shots.strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

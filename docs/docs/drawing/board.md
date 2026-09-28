@@ -5,9 +5,20 @@ walks through a round from the first frame to the celebration.
 
 ## The grid draws itself in
 
-| 150 ms | 350 ms | 900 ms |
-|---|---|---|
-| ![](../images/board-drawin-150.png) | ![](../images/board-drawin-350.png) | ![](../images/board-drawin-900.png) |
+<div class="shots" markdown>
+<figure markdown="span">
+![150 ms](../images/board-drawin-150.png){ loading=lazy }
+<figcaption>150 ms</figcaption>
+</figure>
+<figure markdown="span">
+![350 ms](../images/board-drawin-350.png){ loading=lazy }
+<figcaption>350 ms</figcaption>
+</figure>
+<figure markdown="span">
+![900 ms](../images/board-drawin-900.png){ loading=lazy }
+<figcaption>900 ms</figcaption>
+</figure>
+</div>
 
 A single `grid` Animatable runs 0 → 1 over 750 ms. Each of the four lines derives its own staggered progress from it
 (vertical lines first, horizontals 0.12 later), and draws from its start point to `start + length × progress`. When a
@@ -50,9 +61,20 @@ When a line wins, every non-winning mark fades to 40% as the win stroke burns in
 
 ## The win sequence
 
-| Ignite (820 ms) | Burst (1250 ms) | Settled |
-|---|---|---|
-| ![](../images/win-ignite.png) | ![](../images/win-burst.png) | ![](../images/win-settled.png) |
+<div class="shots" markdown>
+<figure markdown="span">
+![Ignite (820 ms)](../images/win-ignite.png){ loading=lazy }
+<figcaption>Ignite (820 ms)</figcaption>
+</figure>
+<figure markdown="span">
+![Burst (1250 ms)](../images/win-burst.png){ loading=lazy }
+<figcaption>Burst (1250 ms)</figcaption>
+</figure>
+<figure markdown="span">
+![Settled](../images/win-settled.png){ loading=lazy }
+<figcaption>Settled</figcaption>
+</figure>
+</div>
 
 After a short delay (so the last mark finishes drawing), two animations start together: `winProgress` (the stroke
 and heat zones) and `burst` (particles). They're covered in detail in [Gradients, heat & particles](effects.md).

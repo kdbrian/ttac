@@ -1,9 +1,13 @@
-# 16. Sound synthesis & haptics 🔴
+# 17. Sound synthesis & haptics 🔴
 
 TTac ships no audio files. Every blip, chime and fanfare is **synthesised** at startup from oscillators
 (`fx/Fx.kt`), and every buzz is a vibration waveform.
 
-![Settings with sound and haptics toggles](../images/screen-settings.png){ width="35%" }
+<figure class="single" markdown="span">
+![Sound and vibration quick toggles, top right of the home screen](../images/crop/home-hero.png#only-dark){ loading=lazy }
+![Sound and vibration quick toggles, top right of the home screen](../images/crop/home-hero-light.png#only-light){ loading=lazy }
+<figcaption>Sound and vibration quick toggles, top right of the home screen — the app follows the same light/dark theme as this page</figcaption>
+</figure>
 
 ## Digital audio in one paragraph
 

@@ -15,9 +15,20 @@ flexible, and the physics behind springs.
 
 ## Easing vs springs
 
-| Stroke at 180 ms (tween) | Pop overshooting at 300 ms (spring) | Settled at 700 ms |
-|---|---|---|
-| ![](../images/mark-frame-180.png) | ![](../images/mark-frame-300.png) | ![](../images/mark-frame-700.png) |
+<div class="shots" markdown>
+<figure markdown="span">
+![Stroke at 180 ms (tween)](../images/crop/mark-180.png){ loading=lazy }
+<figcaption>Stroke at 180 ms (tween)</figcaption>
+</figure>
+<figure markdown="span">
+![Pop overshooting at 300 ms (spring)](../images/crop/mark-300.png){ loading=lazy }
+<figcaption>Pop overshooting at 300 ms (spring)</figcaption>
+</figure>
+<figure markdown="span">
+![Settled at 700 ms](../images/crop/mark-700.png){ loading=lazy }
+<figcaption>Settled at 700 ms</figcaption>
+</figure>
+</div>
 
 - **Linear** moves at constant speed — mechanical.
 - **FastOutSlowIn** starts quick and decelerates — natural for things that *arrive*. The mark stroke uses it, which

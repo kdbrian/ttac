@@ -3,7 +3,16 @@
 A game is a state machine: *whose turn*, *is it over*, *what happens next*. TTac's `Match` (`app/Match.kt`) models a
 whole sitting — many rounds between the same seats — for solo, pass-and-play and LAN.
 
-![Game screen](../images/screen-game.png){ width="35%" }
+<div class="shots two" markdown>
+<figure markdown="span">
+![Seats: ✕ You vs ◯ CPU — the CPU card shows THINKING](../images/crop/game-cards.png){ loading=lazy }
+<figcaption>Seats: ✕ You vs ◯ CPU — the CPU card shows THINKING</figcaption>
+</figure>
+<figure markdown="span">
+![The board while the AI thinks: taps are ignored](../images/crop/game-board.png){ loading=lazy }
+<figcaption>The board while the AI thinks: taps are ignored</figcaption>
+</figure>
+</div>
 
 ## States and transitions
 

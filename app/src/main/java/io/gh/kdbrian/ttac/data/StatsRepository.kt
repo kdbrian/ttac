@@ -168,6 +168,17 @@ object StatsReducer {
         )
     }
 
+    /** A duel won by a player on this phone. */
+    fun recordLudoDuel(data: StatsData): StatsData =
+        data.copy(coins = data.coins + LudoRewards.DUEL_COINS, ludo = data.ludo.copy(duelsWon = data.ludo.duelsWon + 1))
+
+    /** A finished Ludo game from this phone's point of view. */
+    fun recordLudoGame(data: StatsData, won: Boolean): StatsData = data.copy(
+        coins = data.coins + LudoRewards.PLAY_COINS + if (won) LudoRewards.WIN_COINS else 0,
+        gems = data.gems + if (won) LudoRewards.WIN_GEMS else 0,
+        ludo = data.ludo.copy(played = data.ludo.played + 1, wins = data.ludo.wins + if (won) 1 else 0),
+    )
+
     fun newlyUnlocked(before: StatsData, after: StatsData): List<ArcadeGame> = after.unlocked - before.unlocked.toSet()
 
     /**
@@ -237,6 +248,9 @@ class StatsRepository(context: Context, private val scope: CoroutineScope) {
         StatsReducer.recordBlocks(old, won, score, lines).also { emitUnlocks(old, it) }
     }
 
+    fun recordLudoDuel() = update { StatsReducer.recordLudoDuel(it) }
+    fun recordLudoGame(won: Boolean) = update { StatsReducer.recordLudoGame(it, won) }
+
     fun useDemo(game: ArcadeGame) = update { if (game in it.demosUsed) it else it.copy(demosUsed = it.demosUsed + game) }
 
     fun recordHive(points: Int, words: Int, levelCleared: Boolean) = update { StatsReducer.recordHive(it, points, words, levelCleared) }
@@ -262,7 +276,7 @@ class StatsRepository(context: Context, private val scope: CoroutineScope) {
     fun deleteProfile(id: String) = update { data -> data.copy(profiles = data.profiles.filterNot { it.id == id }) }
 
     /** Clears scores, history and medals — but games you've unlocked stay unlocked. */
-    fun resetScores() = update { StatsData(profiles = it.profiles, playerNames = it.playerNames, unlocked = it.unlocked, hive = it.hive, demosUsed = it.demosUsed) }
+    fun resetScores() = update { StatsData(profiles = it.profiles, playerNames = it.playerNames, unlocked = it.unlocked, hive = it.hive, demosUsed = it.demosUsed, coins = it.coins, gems = it.gems) }
 
     private fun update(transform: (StatsData) -> StatsData) {
         scope.launch(Dispatchers.IO) {

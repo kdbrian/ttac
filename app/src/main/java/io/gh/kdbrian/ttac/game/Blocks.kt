@@ -1,8 +1,10 @@
 package io.gh.kdbrian.ttac.game
 
+import kotlinx.serialization.Serializable
 import kotlin.math.pow
 import kotlin.random.Random
 
+@Serializable
 enum class Tetromino(private val rows: List<String>) {
     I(listOf("....", "XXXX", "....", "....")),
     O(listOf("XX", "XX")),
@@ -27,6 +29,7 @@ enum class Tetromino(private val rows: List<String>) {
  * Board size, starting speed and a line milestone. Play is endless — a run ends only when the
  * stack tops out — and a run that passed its milestone counts as a win.
  */
+@Serializable
 enum class BlocksDifficulty(val label: String, val width: Int, val height: Int, val gravityMs: Long, val goalLines: Int) {
     EASY("Easy", 8, 16, 760, 8),
     MEDIUM("Medium", 10, 20, 520, 12),
@@ -167,7 +170,31 @@ class BlocksGame(val difficulty: BlocksDifficulty, private val random: Random = 
         spawn()
     }
 
+    /** Everything needed to rebuild this run exactly — used to resume after the app is backgrounded. */
+    fun snapshot() = BlocksSnapshot(difficulty, grid.toList(), piece, rot, px, py, bag.toList(), score, lines, won)
+
     companion object {
         private val LINE_SCORES = intArrayOf(0, 100, 300, 500, 800)
+
+        fun restore(s: BlocksSnapshot, random: Random = Random.Default): BlocksGame = BlocksGame(s.difficulty, random).apply {
+            s.grid.forEachIndexed { i, v -> grid[i] = v }
+            piece = s.piece; rot = s.rot; px = s.px; py = s.py
+            bag.clear(); bag.addAll(s.bag)
+            score = s.score; lines = s.lines; won = s.won
+        }
     }
 }
+
+@Serializable
+data class BlocksSnapshot(
+    val difficulty: BlocksDifficulty,
+    val grid: List<Int>,
+    val piece: Tetromino,
+    val rot: Int,
+    val px: Int,
+    val py: Int,
+    val bag: List<Tetromino>,
+    val score: Int,
+    val lines: Int,
+    val won: Boolean,
+)
