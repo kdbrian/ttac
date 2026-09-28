@@ -6,8 +6,12 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version name (e.g. 1.2.0)
-        required: true
+        description: Version name (e.g. 1.2.0) — leave empty with "docs only"
+        required: false
+      docs_only:
+        description: Only rebuild and publish the developer guide
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -15,6 +19,7 @@ permissions:
 jobs:
   release:
     name: Build & publish release
+    if: ${{ !inputs.docs_only }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -71,3 +76,44 @@ jobs:
           name: TTac ${{ env.TTAC_VERSION_NAME }}
           generate_release_notes: true
           files: dist/*
+
+  docs:
+    name: Guide & API reference → GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: API reference (Dokka)
+        run: ./gradlew :app:dokkaGeneratePublicationHtml
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Guide (MkDocs Material)
+        run: |
+          pip install -r docs/requirements.txt
+          mkdocs build --strict --config-file docs/mkdocs.yml
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

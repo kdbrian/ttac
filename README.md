@@ -85,8 +85,10 @@ A Baseline Profile ships with release builds (via `androidx.profileinstaller`), 
 
 ## CI & releases
 
-- **CI** (`.github/workflows/ci.yml`) — on every push and pull request: unit tests, lint, debug build and the benchmark module.
-- **Release** (`.github/workflows/release.yml`) — on a `v*` tag (or manual run): builds the release APK and AAB and publishes a GitHub release.
+- **CI** (`.github/workflows/ci.yml`) — on every push and pull request: unit & screenshot tests, then a debug build.
+- **Release** (`.github/workflows/release.yml`) — on a `v*` tag (or manual run): builds the release APK and AAB,
+  publishes a GitHub release, and deploys the developer guide + API reference to GitHub Pages. A manual run with
+  *docs only* republishes just the guide.
 
 To sign releases, add these repository secrets: `KEYSTORE_BASE64` (base64 of your `.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`. Without them the release APK is unsigned.
 
