@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version name (e.g. 1.2.0)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TTAC_VERSION_NAME: ${{ github.event.inputs.version || github.ref_name }}
+      TTAC_VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Normalise version name
+        run: echo "TTAC_VERSION_NAME=${TTAC_VERSION_NAME#v}" >> "$GITHUB_ENV"
+
+      # Optional signing: add KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS and KEY_PASSWORD
+      # repository secrets to get a signed build; otherwise the release APK is unsigned.
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+          echo "TTAC_KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Test
+        run: ./gradlew testDebugUnitTest
+
+      - name: Build release APK and bundle
+        env:
+          TTAC_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          TTAC_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          TTAC_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew :app:assembleRelease :app:bundleRelease
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/*.apk "dist/ttac-${TTAC_VERSION_NAME}.apk"
+          cp app/build/outputs/bundle/release/*.aab "dist/ttac-${TTAC_VERSION_NAME}.aab"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ttac-release
+          path: dist/*
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version && format('v{0}', github.event.inputs.version) || github.ref_name }}
+          name: TTac ${{ env.TTAC_VERSION_NAME }}
+          generate_release_notes: true
+          files: dist/*

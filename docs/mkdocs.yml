@@ -1,0 +1,86 @@
+site_name: TTac — Game Development with Compose Canvas
+site_description: A beginner-to-pro guide to building a game with Kotlin, Jetpack Compose and the Canvas, told through TTac's source.
+repo_url: https://github.com/kdbrian/ttac
+edit_uri: edit/main/docs/docs/
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle: { icon: material/weather-sunny, name: Light mode }
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: amber
+      toggle: { icon: material/weather-night, name: Dark mode }
+  font:
+    text: Fredoka
+    code: JetBrains Mono
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.footer
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - def_list
+  - toc: { permalink: true }
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight: { anchor_linenums: true }
+  - pymdownx.inlinehilite
+  - pymdownx.arithmatex: { generic: true }
+  - pymdownx.tabbed: { alternate_style: true }
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Welcome: index.md
+  - Foundations:
+      - 1. Setup & project layout: foundations/setup.md
+      - 2. The Compose mental model: foundations/compose-model.md
+      - 3. Canvas fundamentals: foundations/canvas.md
+  - Drawing:
+      - 4. Drawing marks as polylines: drawing/marks.md
+      - 5. Animation & motion: drawing/animation.md
+      - 6. Rendering the board: drawing/board.md
+      - 7. Gradients, heat & particles: drawing/effects.md
+      - 8. Living backdrops: drawing/backdrops.md
+      - 9. A UI kit on Canvas: drawing/ui-kit.md
+  - Game logic:
+      - 10. Rules as pure Kotlin: logic/rules.md
+      - 11. Game AI — minimax to alpha-beta: logic/ai.md
+      - 12. State machines & turns: logic/state-machines.md
+      - 13. Input & gestures: logic/input.md
+  - Arcade:
+      - 14. Blocks — a falling-block engine: arcade/blocks.md
+      - 15. Word Hive — hex grids & generation: arcade/hive.md
+  - Systems:
+      - 16. Sound synthesis & haptics: systems/audio.md
+      - 17. Persistence & reducers: systems/persistence.md
+      - 18. Progression — streaks, medals, unlocks: systems/progression.md
+      - 19. LAN multiplayer: systems/networking.md
+  - Shipping:
+      - 20. Testing & screenshot tests: shipping/testing.md
+      - 21. Performance report: shipping/performance.md
+      - 22. CI/CD & releases: shipping/ci-cd.md
+  - API reference: api/index.html
